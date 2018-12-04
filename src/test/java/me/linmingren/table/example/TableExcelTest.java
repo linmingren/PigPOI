@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.apache.poi.ss.util.CellUtil.FILL_FOREGROUND_COLOR;
 import static org.apache.poi.ss.util.CellUtil.FONT;
 
@@ -24,7 +25,7 @@ public class TableExcelTest {
 
     //最简单的例子, 默认表头样式
     @Test
-    public void simpleRender() throws IOException, InvocationTargetException, IllegalAccessException {
+    public void simpleRender() throws IOException, TableExcelException {
         TableExcel excel = new TableExcel();
         TableSheet sheet = new TableSheet("sheet1");
 
@@ -47,7 +48,7 @@ public class TableExcelTest {
 
     //自定义表头样式
     @Test
-    public void customHeader() throws IOException, InvocationTargetException, IllegalAccessException {
+    public void customHeader() throws IOException, TableExcelException {
         TableExcel excel = new TableExcel();
         TableSheet sheet = new TableSheet("sheet1");
 
@@ -127,7 +128,7 @@ public class TableExcelTest {
 
     //如何自定义数据单元格显示样式的例子
     @Test
-    public void customCell() throws IOException, InvocationTargetException, IllegalAccessException {
+    public void customCell() throws IOException, TableExcelException {
         TableExcel excel = new TableExcel();
         TableSheet sheet = new CustomTableSheet("sheet1", excel);
 
@@ -152,7 +153,7 @@ public class TableExcelTest {
 
     //如何合并单元格的例子，合并单元格最好从模板文件中获取
     @Test
-    public void headerSpan() throws IOException, InvocationTargetException, IllegalAccessException {
+    public void headerSpan() throws IOException, TableExcelException {
         TableExcel excel = new TableExcel();
         TableSheet sheet = new TableSheet("sheet1");
 
@@ -215,4 +216,26 @@ public class TableExcelTest {
     }
 
     //从模板文件引入表头
+
+    //异常的例子
+    @Test
+    public void exceptionRender() throws IOException {
+        TableExcel excel = new TableExcel();
+        TableSheet sheet = new TableSheet("sheet1");
+
+        TableRow row = TableHeaderRow.of(Arrays.asList("姓名", "地址", "分数", "考试时间"));
+        sheet.addRow(row);
+
+        List<User> userList = new ArrayList<>();
+        userList.add(new User("老王", "隔壁", 59, new Date()));
+        userList.add(new User("小明", "草地上", 80, new Date()));
+        userList.add(new User("超人", "飞机上", 100, new Date()));
+        //createdAtd 不存在
+        try {
+            sheet.setData(Arrays.asList("name", "address", "score", "createdAtd"), userList);
+            assertTrue("must throw exception on unknown field", false);
+        } catch (TableExcelException e) {
+        }
+
+    }
 }

@@ -55,14 +55,14 @@ public class TableSheet {
         rows.add(row);
     }
 
-    public void setData(List<String> fieldNames, List dataList) throws InvocationTargetException, IllegalAccessException {
+    public void setData(List<String> fieldNames, List dataList) throws TableExcelException  {
         this.dataFieldNames = fieldNames;
         for (Object data :dataList ) {
             addData(data);
         }
     }
 
-    public void addData(Object data) throws InvocationTargetException, IllegalAccessException {
+    public void addData(Object data) throws TableExcelException {
         Method[] methods = data.getClass().getMethods();
         Map<String, Method> methodMap = new HashMap<>();
         for (Method m : methods) {
@@ -73,9 +73,18 @@ public class TableSheet {
 
         for (int i = 0; i < dataFieldNames.size(); ++i) {
             ///需要通过get方法来获取字段的值，因为有些字段是没有值的，必须通过get方法才会触发计算
+            String fieldName = dataFieldNames.get(i);
             Method method = methodMap.get("get" + dataFieldNames.get(i).toLowerCase());
             if (method != null) {
-                row.addCell(createDataCell(dataFieldNames.get(i),method.invoke(data), this.rows.size(),i));
+                try {
+                    row.addCell(createDataCell(dataFieldNames.get(i),method.invoke(data), this.rows.size(),i));
+                } catch (IllegalAccessException e) {
+                    throw new TableExcelException("failed to get value of field:[" + fieldName +"]",e);
+                } catch (InvocationTargetException e) {
+                    throw new TableExcelException("failed to get value of field:[" + fieldName +"]",e);
+                }
+            } else {
+                throw new TableExcelException("field:[" + fieldName +"] not found");
             }
         }
 
