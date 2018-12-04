@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>me.linmingren</groupId>
-  <artifactId>excelexportor</artifactId>
+  <artifactId>PigPOI</artifactId>
   <version>0.1-SNAPSHOT</version>
 
-  <name>excelexportor</name>
+  <name>PigPOI</name>
 
   <url>http://www.linmingren.me</url>
 
