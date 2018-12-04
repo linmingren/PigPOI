@@ -17,6 +17,7 @@ public class TableExcel {
 
     public TableExcel() {
         this.sheets = new ArrayList<>();
+        workbook = new HSSFWorkbook();
     }
 
     public void addSheet(TableSheet sheet) {
@@ -24,7 +25,7 @@ public class TableExcel {
     }
 
     public void render(OutputStream outputStream) throws IOException {
-        workbook = new HSSFWorkbook();
+
 
         for (TableSheet s :sheets) {
             HSSFSheet sheet = workbook.createSheet(s.getName());

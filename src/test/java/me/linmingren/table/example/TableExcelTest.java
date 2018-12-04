@@ -5,9 +5,7 @@ import me.linmingren.table.*;
 import me.linmingren.table.example.model.SalaryPayment;
 import me.linmingren.table.example.model.User;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 import org.junit.Test;
 
@@ -17,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static org.apache.poi.ss.util.CellUtil.FILL_FOREGROUND_COLOR;
+import static org.apache.poi.ss.util.CellUtil.FONT;
 
 /**
  * Unit test for simple App.
@@ -84,71 +83,53 @@ public class TableExcelTest {
     }
 
     private static class CustomTableSheet extends TableSheet {
-        public CustomTableSheet(String name) {
+        TableExcel workbook;
+        public CustomTableSheet(String name, TableExcel workbook) {
             super(name);
+            this.workbook = workbook;
         }
 
         //自定义数据行的显示效果
         @Override
         protected TableCell createDataCell(String fieldName, Object value, int row, int col) {
-            if (fieldName.equals("score")) {
-                TableCell tableCell = new TableCell(value) {
-                    @Override
-                    public Map updatedStyle() {
-                        Map styleProperties = new HashMap();
-                        if (Double.valueOf(value.toString()) < 60) {
-                            //成绩少于60的背景是红色
-                            styleProperties.put(FILL_FOREGROUND_COLOR,IndexedColors.RED.getIndex());
-                            styleProperties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
-                        }
-
-                        return styleProperties;
-                    }
-                };
-                return tableCell;
-            } else if (col == 0) {
-                //第一列是粗体
-                TableCell tableCell = new TableCell(value) {
-                    @Override
-                    public Map updatedStyle() {
-                        Map styleProperties = new HashMap();
-                        if (Double.valueOf(value.toString()) < 60) {
-                            //成绩少于60的背景是红色
-                            styleProperties.put(FILL_FOREGROUND_COLOR,IndexedColors.RED.getIndex());
-                            styleProperties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
-                        }
-
-                        return styleProperties;
-                    }
-                };
-                return tableCell;
-            } else if (row %2 == 0) {
+            //把优先级最高的效果放在最后面
+            Map styleProperties = new HashMap();
+            if (row % 2 == 0) {
                 //偶数行背景是灰色
-                TableCell tableCell = new TableCell(value) {
-                    @Override
-                    public Map updatedStyle() {
-                        Map styleProperties = new HashMap();
-                        if (Double.valueOf(value.toString()) < 60) {
-                            //成绩少于60的背景是红色
-                            styleProperties.put(FILL_FOREGROUND_COLOR,IndexedColors.RED.getIndex());
-                            styleProperties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
-                        }
-
-                        return styleProperties;
-                    }
-                };
-                return tableCell;
-            }else {
-                return super.createDataCell(fieldName, value, row, col);
+                styleProperties.put(FILL_FOREGROUND_COLOR,IndexedColors.GREY_25_PERCENT.getIndex());
+                styleProperties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
             }
+
+            if (col  == 0) {
+                //第一列是粗体
+                Font f = workbook.getWorkbook().createFont();
+                f.setBold(true);
+                styleProperties.put(FONT, f.getIndexAsInt());
+            }
+
+            if (fieldName.equals("score")) {
+                if (Double.valueOf(value.toString()) < 60) {
+                    //成绩少于60的背景是红色
+                    styleProperties.put(FILL_FOREGROUND_COLOR,IndexedColors.RED.getIndex());
+                    styleProperties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
+                }
+            }
+
+            TableCell tableCell = new TableCell(value) {
+                @Override
+                public Map updatedStyle() {
+                    return styleProperties;
+                }
+            };
+            return tableCell;
         }
     }
 
     //如何自定义数据单元格显示样式的例子
     @Test
-    public void simpleRenderWithCustomCell() throws IOException, InvocationTargetException, IllegalAccessException {
+    public void customCell() throws IOException, InvocationTargetException, IllegalAccessException {
         TableExcel excel = new TableExcel();
-        TableSheet sheet = new CustomTableSheet("sheet1");
+        TableSheet sheet = new CustomTableSheet("sheet1", excel);
 
         TableRow row = TableHeaderRow.of(Arrays.asList("姓名", "地址", "分数", "考试时间"));
         sheet.addRow(row);
@@ -157,12 +138,14 @@ public class TableExcelTest {
         userList.add(new User("老王", "隔壁", 59, new Date()));
         userList.add(new User("小明", "草地上", 80, new Date()));
         userList.add(new User("超人", "飞机上", 100, new Date()));
+        userList.add(new User("蜘蛛侠", "飞机上", 50, new Date()));
+        userList.add(new User("皇帝", "紫禁城", 100, new Date()));
 
         sheet.setData(Arrays.asList("name", "address", "score", "createdAt"), userList);
 
         excel.addSheet(sheet);
 
-        FileOutputStream output = new FileOutputStream("e:/test3.xls");
+        FileOutputStream output = new FileOutputStream("excels/customCell.xls");
         excel.render(output);
         output.close();
     }

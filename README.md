@@ -33,6 +33,55 @@ PigPOI的目的是解决业务中80%左右的导出问题，剩下的20% 就直�
 
 这个工具能够支持的功能在例子中都写出来了，如果没有写出来的，就是不支持，不用去代码中找了，节省你的宝贵的时间。
 
+下面的例子都用到了下面2个Java Bean
+
++ User
+```Java
+@Data
+public class User {
+    private String name;
+    private String address;
+    private int score;
+    private Date createdAt;
+
+    public User(String user, String address, int score, Date createdAt) {
+        this.name = user;
+        this.address = address;
+        this.score = score;
+        this.createdAt = createdAt;
+    }
+}
+```
++ SalaryPayment
+```Java
+@Data
+public class SalaryPayment {
+    private String userName;
+    private int baseSalary;
+    private int fullAttendanceBonus;
+    private int mealSupplement;
+    private int transportationAllowance;
+    private int sickLeave;
+    private int personalLeave;
+
+    public SalaryPayment(String userName, int baseSalary, int fullAttendanceBonus, int mealSupplement,
+                         int transportationAllowance,  int sickLeave, int personalLeave) {
+        this.userName = userName;
+        this.baseSalary = baseSalary;
+        this.fullAttendanceBonus = fullAttendanceBonus;
+        this.mealSupplement = mealSupplement;
+        this.transportationAllowance = transportationAllowance;
+        this.sickLeave = sickLeave;
+        this.personalLeave = personalLeave;
+    }
+
+    public int getActualPay() {
+        return this.baseSalary + this.fullAttendanceBonus + this.mealSupplement + this.transportationAllowance
+                - sickLeave - personalLeave;
+    }
+}
+```
+
 ## 最简单的导出
 
 ```Java
@@ -170,5 +219,79 @@ output.close();
 ## 从模板到引入表头
 
 ## 自定义单元格样式
+
+```Java
+ private static class CustomTableSheet extends TableSheet {
+        TableExcel workbook;
+        public CustomTableSheet(String name, TableExcel workbook) {
+            super(name);
+            this.workbook = workbook;
+        }
+
+        //自定义数据行的显示效果
+        @Override
+        protected TableCell createDataCell(String fieldName, Object value, int row, int col) {
+            //把优先级最高的效果放在最后面
+            Map styleProperties = new HashMap();
+            if (row % 2 == 0) {
+                //偶数行背景是灰色
+                styleProperties.put(FILL_FOREGROUND_COLOR,IndexedColors.GREY_25_PERCENT.getIndex());
+                styleProperties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
+            }
+
+            if (col  == 0) {
+                //第一列是粗体
+                Font f = workbook.getWorkbook().createFont();
+                f.setBold(true);
+                styleProperties.put(FONT, f.getIndexAsInt());
+            }
+
+            if (fieldName.equals("score")) {
+                if (Double.valueOf(value.toString()) < 60) {
+                    //成绩少于60的背景是红色
+                    styleProperties.put(FILL_FOREGROUND_COLOR,IndexedColors.RED.getIndex());
+                    styleProperties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
+                }
+            }
+
+            TableCell tableCell = new TableCell(value) {
+                @Override
+                public Map updatedStyle() {
+                    return styleProperties;
+                }
+            };
+            return tableCell;
+        }
+    }
+
+    //如何自定义数据单元格显示样式的例子
+    @Test
+    public void customCell() throws IOException, InvocationTargetException, IllegalAccessException {
+        TableExcel excel = new TableExcel();
+        TableSheet sheet = new CustomTableSheet("sheet1", excel);
+
+        TableRow row = TableHeaderRow.of(Arrays.asList("姓名", "地址", "分数", "考试时间"));
+        sheet.addRow(row);
+
+        List<User> userList = new ArrayList<>();
+        userList.add(new User("老王", "隔壁", 59, new Date()));
+        userList.add(new User("小明", "草地上", 80, new Date()));
+        userList.add(new User("超人", "飞机上", 100, new Date()));
+        userList.add(new User("蜘蛛侠", "飞机上", 50, new Date()));
+        userList.add(new User("皇帝", "紫禁城", 100, new Date()));
+
+        sheet.setData(Arrays.asList("name", "address", "score", "createdAt"), userList);
+
+        excel.addSheet(sheet);
+
+        FileOutputStream output = new FileOutputStream("excels/customCell.xls");
+        excel.render(output);
+        output.close();
+    }
+```
+
+导出结果
+
+![](https://raw.githubusercontent.com/linmingren/helloexcel/master/images/customCell.png)
 
 ## 性能
