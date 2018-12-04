@@ -5,17 +5,15 @@ import lombok.Data;
 @Data
 public class SalaryPayment {
     private String userName;
-    private Double baseSalary;
-    private Double fullAttendanceBonus;
-    private Double mealSupplement;
-    private Double transportationAllowance;
-    private Double sickLeave;
-    private Double personalLeave;
-    private Double actualPay;
+    private int baseSalary;
+    private int fullAttendanceBonus;
+    private int mealSupplement;
+    private int transportationAllowance;
+    private int sickLeave;
+    private int personalLeave;
 
-    public SalaryPayment(String userName, Double baseSalary, Double fullAttendanceBonus, Double mealSupplement,
-                         Double transportationAllowance, Double sickLeave, Double personalLeave,
-                         Double actualPay) {
+    public SalaryPayment(String userName, int baseSalary, int fullAttendanceBonus, int mealSupplement,
+                         int transportationAllowance,  int sickLeave, int personalLeave) {
         this.userName = userName;
         this.baseSalary = baseSalary;
         this.fullAttendanceBonus = fullAttendanceBonus;
@@ -23,6 +21,10 @@ public class SalaryPayment {
         this.transportationAllowance = transportationAllowance;
         this.sickLeave = sickLeave;
         this.personalLeave = personalLeave;
-        this.actualPay = actualPay;
+    }
+
+    public int getActualPay() {
+        return this.baseSalary + this.fullAttendanceBonus + this.mealSupplement + this.transportationAllowance
+                - sickLeave - personalLeave;
     }
 }

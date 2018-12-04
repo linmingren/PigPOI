@@ -59,7 +59,7 @@ output.close();
 导出结果
 
 ![](https://raw.githubusercontent.com/linmingren/helloexcel/master/images/simpleTable.png)
-## 自定义单元格的显示样式
+## 自定义表头显示样式
 ```Java
         TableExcel excel = new TableExcel();
         TableSheet sheet = new TableSheet("sheet1");
@@ -101,6 +101,74 @@ output.close();
 
 ## 合并表头
 
+```Java
+        TableExcel excel = new TableExcel();
+        TableSheet sheet = new TableSheet("sheet1");
+
+        TableRow row = new TableHeaderRow();
+        TableCell cell = new TableCell("姓名");
+        cell.setRowSpan(3);
+        row.addCell(cell);
+        cell = new TableCell("收入");
+        cell.setColSpan(4);
+        row.addCell(cell);
+        cell = new TableCell("扣除");
+        cell.setColSpan(2);
+        row.addCell(cell);
+        cell = new TableCell("实际发放");
+        cell.setRowSpan(3);
+        row.addCell(cell);
+        sheet.addRow(row);
+
+        row = new TableHeaderRow();
+
+        cell = new TableCell("基本工资");
+        cell.setRowSpan(2);
+        row.addCell(cell);
+        cell = new TableCell("补贴");
+        cell.setColSpan(3);
+        row.addCell(cell);
+        cell = new TableCell("事假");
+        cell.setRowSpan(2);
+        row.addCell(cell);
+        cell = new TableCell("病假");
+        cell.setRowSpan(2);
+        row.addCell(cell);
+        sheet.addRow(row);
+
+        row = new TableHeaderRow();
+        cell = new TableCell("全勤");
+        row.addCell(cell);
+
+        cell = new TableCell("餐补");
+        row.addCell(cell);
+        cell = new TableCell("交通补助");
+        row.addCell(cell);
+        sheet.addRow(row);
+
+        List<SalaryPayment> userList = new ArrayList<>();
+        userList.add(new SalaryPayment("老王", 100000, 0, 1000, 200, 300, 400));
+        userList.add(new SalaryPayment("小明", 10000, 1000, 1000, 300, 3000, 400));
+        userList.add(new SalaryPayment("超人", 20000, 0, 1000, 0, 0, 400));
+
+
+        sheet.setData(Arrays.asList("userName", "baseSalary", "fullAttendanceBonus", "mealSupplement", "transportationAllowance", "sickLeave", "personalLeave", "actualPay"),
+                userList);
+
+
+        excel.addSheet(sheet);
+
+        FileOutputStream output = new FileOutputStream("excels/headerSpan.xls");
+        excel.render(output);
+        output.close();
+```
+
+导出结果
+
+![](https://raw.githubusercontent.com/linmingren/helloexcel/master/images/headerSpan.png)
+
 ## 从模板到引入表头
+
+## 自定义单元格样式
 
 ## 性能

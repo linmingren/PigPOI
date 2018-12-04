@@ -169,7 +169,7 @@ public class TableExcelTest {
 
     //如何合并单元格的例子，合并单元格最好从模板文件中获取
     @Test
-    public void renderWithSpan() throws IOException, InvocationTargetException, IllegalAccessException {
+    public void headerSpan() throws IOException, InvocationTargetException, IllegalAccessException {
         TableExcel excel = new TableExcel();
         TableSheet sheet = new TableSheet("sheet1");
 
@@ -215,10 +215,9 @@ public class TableExcelTest {
         sheet.addRow(row);
 
         List<SalaryPayment> userList = new ArrayList<>();
-        userList.add(new SalaryPayment("user1", 10000d, 10d, 1000d, 2d, 3d, 4d, 5d));
-        userList.add(new SalaryPayment("user2", 10000d, 10d, 1000d, 2d, 3d, 4d, 5d));
-        userList.add(new SalaryPayment("user3", 10000d, 10d, 1000d, 2d, 3d, 4d, 5d));
-        userList.add(new SalaryPayment("user4", 10000d, 10d, 1000d, 2d, 3d, 4d, 5d));
+        userList.add(new SalaryPayment("老王", 100000, 0, 1000, 200, 300, 400));
+        userList.add(new SalaryPayment("小明", 10000, 1000, 1000, 300, 3000, 400));
+        userList.add(new SalaryPayment("超人", 20000, 0, 1000, 0, 0, 400));
 
 
         sheet.setData(Arrays.asList("userName", "baseSalary", "fullAttendanceBonus", "mealSupplement", "transportationAllowance", "sickLeave", "personalLeave", "actualPay"),
@@ -227,7 +226,7 @@ public class TableExcelTest {
 
         excel.addSheet(sheet);
 
-        FileOutputStream output = new FileOutputStream("e:/test2.xls");
+        FileOutputStream output = new FileOutputStream("excels/headerSpan.xls");
         excel.render(output);
         output.close();
     }
