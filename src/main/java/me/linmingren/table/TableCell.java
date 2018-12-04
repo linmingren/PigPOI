@@ -3,7 +3,9 @@ package me.linmingren.table;
 import lombok.Data;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 
@@ -25,7 +27,7 @@ public class TableCell {
         this.value = value;
     }
 
-    public void render(HSSFCell cell, int nextCol) {
+    public void render(Cell cell, int nextCol) {
         setCellValue(cell);
 
         //如果设置了行样式，则继承
@@ -37,7 +39,7 @@ public class TableCell {
         CellUtil.setCellStyleProperties(cell, updatedStyle());
 
         //合并单元格
-        HSSFRow row = cell.getRow();
+        Row row = cell.getRow();
 
         if (rowSpan >1) {
             CellRangeAddress mergedRegion = new CellRangeAddress(row.getRowNum(),row.getRowNum() + rowSpan - 1,nextCol,nextCol);
@@ -50,7 +52,7 @@ public class TableCell {
         }
     }
 
-    private void setCellValue(HSSFCell cell) {
+    private void setCellValue(Cell cell) {
         if (value instanceof BigDecimal) {
             double intValue = ((BigDecimal) value).doubleValue();
             cell.setCellValue(intValue);

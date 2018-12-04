@@ -31,7 +31,7 @@ public class TableRow {
         return -1;
     }
 
-    public void render(int[] freeRow, HSSFRow row) {
+    public void render(int[] freeRow, Row row) {
 
         int nextCol = findUnusedCol(freeRow,  row.getRowNum());
 
@@ -41,7 +41,7 @@ public class TableRow {
                 freeRow[j] = freeRow[j] + tableCell.getRowSpan();
             }
 
-            HSSFCell cell = row.createCell(nextCol);
+            Cell cell = row.createCell(nextCol);
             //如果当前行设置了样式，则把样式应用到该行所有的单元格上
             tableCell.setRowStyle(updatedStyle());
             tableCell.render(cell, nextCol);

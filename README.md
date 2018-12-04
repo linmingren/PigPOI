@@ -216,7 +216,38 @@ output.close();
 
 ![](https://raw.githubusercontent.com/linmingren/helloexcel/master/images/headerSpan.png)
 
-## 从模板到引入表头
+## 从模板文件引入表头
+
+上面那个例子，为了合并表头的单元格，代码写得有点长，而且很不直观，万一有一个rowspan或者colspan设置有错误，
+那么出来的表格就乱套了。这时候最好是先在一个Excel文件中手工把表头设计好，然后在代码中引用它。
+
+
+```Java
+        TableExcel excel = new TableExcel();
+        excel.importHeadersFromTemplate("headerSpan.xls");
+
+        //这里的sheet的名字必须和模板文件中的一个sheet一样，否则就不会从模板引入样式
+        TableSheet sheet = new TableSheet("sheet1");
+        List<SalaryPayment> userList = new ArrayList<>();
+        userList.add(new SalaryPayment("老王", 100000, 0, 1000, 200, 300, 400));
+        userList.add(new SalaryPayment("小明", 10000, 1000, 1000, 300, 3000, 400));
+        userList.add(new SalaryPayment("超人", 20000, 0, 1000, 0, 0, 400));
+
+
+        sheet.setData(Arrays.asList("userName", "baseSalary", "fullAttendanceBonus", "mealSupplement", "transportationAllowance", "sickLeave", "personalLeave", "actualPay"),
+                userList);
+
+        excel.addSheet(sheet);
+
+        FileOutputStream output = new FileOutputStream("excels/importFromTemplate.xls");
+        excel.render(output);
+        output.close();
+```
+
+导出结果和上面的例子一样(因为模板文件中的表头就是从上一个例子里复制出来的)
+
+![](https://raw.githubusercontent.com/linmingren/helloexcel/master/images/headerSpan.png)
+
 
 ## 自定义单元格样式
 

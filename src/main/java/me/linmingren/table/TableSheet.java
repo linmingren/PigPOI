@@ -2,9 +2,13 @@ package me.linmingren.table;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellUtil;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ public class TableSheet {
 
     private List data;
     private List<String> dataFieldNames;
+    private Sheet templateSheet;
 
     public TableSheet(String name) {
         this.rows = new ArrayList<>();
@@ -37,15 +42,15 @@ public class TableSheet {
         return row;
     }
 
-    public void render(HSSFSheet sheet) {
+    public void render(Sheet sheet) {
         //下标是列的编号， 值是该列上的可用的行号， 比如freeRow[0]是0, 说明第一列上第一行是可以添加新行的
         int[] freeRow = new int[dataFieldNames.size()];
         for (int i = 0 ; i < freeRow.length; ++i) {
-            freeRow[i] = 0;
+            freeRow[i] = sheet.getLastRowNum() > 0 ? sheet.getLastRowNum() + 1 : 0;
         }
 
         for (int i = 0; i < rows.size(); ++i) {
-            HSSFRow row = sheet.createRow(findUnusedRow(freeRow));
+            Row row = sheet.createRow(findUnusedRow(freeRow));
             rows.get(i).setWorkbook(sheet.getWorkbook());
             rows.get(i).render(freeRow,row);
         }

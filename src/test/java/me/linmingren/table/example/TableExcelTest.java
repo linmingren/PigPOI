@@ -55,7 +55,7 @@ public class TableExcelTest {
         TableHeaderRow row = new TableHeaderRow(){
             @Override
             protected CellStyle updatedStyle() {
-                HSSFCellStyle cellStyle = excel.getWorkbook().createCellStyle();
+                CellStyle cellStyle = excel.getWorkbook().createCellStyle();
                 cellStyle.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
                 cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
                 return cellStyle;
@@ -216,7 +216,28 @@ public class TableExcelTest {
     }
 
     //从模板文件引入表头
+    @Test
+    public void importSimpleTableFromTemplate() throws IOException, TableExcelException {
+        TableExcel excel = new TableExcel();
+        excel.importHeadersFromTemplate("headerSpan.xls");
 
+        //这里的sheet的名字必须和模板文件中的一个sheet一样，否则就不会从模板引入样式
+        TableSheet sheet = new TableSheet("sheet1");
+        List<SalaryPayment> userList = new ArrayList<>();
+        userList.add(new SalaryPayment("老王", 100000, 0, 1000, 200, 300, 400));
+        userList.add(new SalaryPayment("小明", 10000, 1000, 1000, 300, 3000, 400));
+        userList.add(new SalaryPayment("超人", 20000, 0, 1000, 0, 0, 400));
+
+
+        sheet.setData(Arrays.asList("userName", "baseSalary", "fullAttendanceBonus", "mealSupplement", "transportationAllowance", "sickLeave", "personalLeave", "actualPay"),
+                userList);
+
+        excel.addSheet(sheet);
+
+        FileOutputStream output = new FileOutputStream("excels/importFromTemplate.xls");
+        excel.render(output);
+        output.close();
+    }
     //异常的例子
     @Test
     public void exceptionRender() throws IOException {
