@@ -35,6 +35,29 @@ PigPOI的目的是解决业务中80%左右的导出问题，剩下的20% 就直�
 
 ## 最简单的导出
 
+```Java
+        TableExcel excel = new TableExcel();
+        TableSheet sheet = new TableSheet("sheet1");
+
+        TableRow row = TableHeaderRow.of(Arrays.asList("姓名", "地址", "分数", "考试时间"));
+        sheet.addRow(row);
+
+        List<User> userList = new ArrayList<>();
+        userList.add(new User("老王", "隔壁", 59, new Date()));
+        userList.add(new User("小明", "草地上", 80, new Date()));
+        userList.add(new User("超人", "飞机上", 100, new Date()));
+
+        sheet.setData(Arrays.asList("name", "address", "score", "createdAt"), userList);
+
+        excel.addSheet(sheet);
+
+        FileOutputStream output = new FileOutputStream("excels/simpleRender.xls");
+        excel.render(output);
+        output.close();
+```
+
+结果
+![](https://raw.githubusercontent.com/linmingren/helloexcel/master/images/simpleTable.png)
 ## 自定义单元格的显示样式
 
 ## 合并表头

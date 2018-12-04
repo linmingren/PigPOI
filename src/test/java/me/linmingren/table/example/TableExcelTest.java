@@ -39,7 +39,7 @@ public class TableExcelTest {
 
         excel.addSheet(sheet);
 
-        FileOutputStream output = new FileOutputStream("e:/test1.xls");
+        FileOutputStream output = new FileOutputStream("excels/simpleRender.xls");
         excel.render(output);
         output.close();
     }
