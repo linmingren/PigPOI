@@ -4,6 +4,8 @@ package me.linmingren.table.example;
 import me.linmingren.table.*;
 import me.linmingren.table.example.model.SalaryPayment;
 import me.linmingren.table.example.model.User;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.util.CellUtil;
@@ -50,7 +52,21 @@ public class TableExcelTest {
         TableExcel excel = new TableExcel();
         TableSheet sheet = new TableSheet("sheet1");
 
-        TableRow row = TableHeaderRow.of(Arrays.asList("姓名", "地址", "分数", "考试时间"));
+        TableHeaderRow row = new TableHeaderRow(){
+            @Override
+            protected CellStyle updatedStyle() {
+                HSSFCellStyle cellStyle = excel.getWorkbook().createCellStyle();
+                cellStyle.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+                cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                return cellStyle;
+            }
+        };
+
+        for (String t :Arrays.asList("姓名", "地址", "分数", "考试时间")) {
+            row.addCell(new TableCell(t));
+        }
+
+
         sheet.addRow(row);
 
         List<User> userList = new ArrayList<>();
@@ -62,7 +78,7 @@ public class TableExcelTest {
 
         excel.addSheet(sheet);
 
-        FileOutputStream output = new FileOutputStream("e:/test1.xls");
+        FileOutputStream output = new FileOutputStream("excels/customHeader.xls");
         excel.render(output);
         output.close();
     }
